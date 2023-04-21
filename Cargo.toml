@@ -1,0 +1,13 @@
+[package]
+name = "judson"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+zip = "0.6.4"
+walkdir = "2.3.3"
+zip_archive = "1.2.2"
+itertools = "0.7.4"
