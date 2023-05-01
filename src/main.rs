@@ -23,7 +23,7 @@ fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Erro
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let nodemodrm = &args[1];
+    // let nodemodrm = &args[1]; If we are gonna use args
 
     let mut filesdir: Vec<String> = Vec::new();
     let reader = BufReader::new(File::open("files.txt").expect("Cannot open file.txt"));
@@ -33,7 +33,6 @@ fn main() {
     }
     println!("{:?}", filesdir);
     for files in filesdir {
-        // let result = DirectScan::directscan::folders(Path::new("/home/ayaan/Desktop/Coding")).unwrap();
         let res = match DirectScan::directscan::folders(Path::new(&files)) {
             Ok(vecout) => vecout,
             Err(e) => {
@@ -65,13 +64,11 @@ fn main() {
 
             if !res1.is_empty() {
                 let latest_commit = *modif.iter().min().unwrap();
-                let dir_names = res1.iter().nth(0).unwrap();
-                if nodemodrm == "true" {
-                    let javascript: String =
-                        res1.iter().nth(0).unwrap().as_path().display().to_string()
-                            + "/node_modules";
-                    fs::remove_dir_all(javascript).unwrap();
-                }
+
+                // if nodemodrm == "true" {} If we are gonna use args
+                let javascript: String =
+                    res1.iter().nth(0).unwrap().as_path().display().to_string() + "/node_modules";
+                fs::remove_dir_all(javascript).unwrap();
 
                 if latest_commit > 15 {
                     // valuedir.push(dir_names.to_path_buf());
@@ -95,20 +92,4 @@ fn main() {
         }
         println! {"\n"}
     }
-
-    // for dir in valuedir {
-    // let origin = PathBuf::from(&dir);
-    // let dest = PathBuf::from("./dest");
-    // let thread_count = 8;
-
-    // let mut archiver = Archiver::new();
-    // archiver.push(origin);
-    // archiver.set_destination(dest);
-    // archiver.set_thread_count(thread_count);
-
-    // match archiver.archive() {
-    //     Ok(_) => (println!("Built!")),
-    //     Err(e) => println!("Cannot archive the directory! {}", e),
-    // }
-    // // }
 }
