@@ -1,26 +1,12 @@
 #![allow(non_snake_case)]
 
-use itertools::min;
+use clap::Parser;
 use std::fs::{self, metadata, File};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
-use std::time::SystemTime;
 use std::{env, io, thread};
-use zip_archive::Archiver;
 mod DirectScan;
 mod Zipper;
-
-// Maybe make value into a dictionary (text:modification time)
-fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let file = File::open(filepath)?;
-    let reader = BufReader::new(file);
-
-    for line in reader.lines() {
-        println!("{}", line?);
-    }
-
-    Ok(())
-}
 
 fn main() {
     let args: Vec<String> = env::args().collect();
