@@ -48,7 +48,7 @@ pub fn list_files(
             }
         }
     }
-    // println!("{:?}", value);s
+    // println!("{:?}", value);
     // let latest_commit = *modifying.iter().min().unwrap();
 
     let v: Vec<PathBuf> = value.into_iter().unique().collect();

@@ -8,6 +8,7 @@ use std::time::SystemTime;
 use std::{env, io, thread};
 use zip_archive::Archiver;
 mod DirectScan;
+mod Zipper;
 
 // Maybe make value into a dictionary (text:modification time)
 fn read_file_line_by_line(filepath: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -62,33 +63,7 @@ fn main() {
                     }
                 };
 
-            if !res1.is_empty() {
-                let latest_commit = *modif.iter().min().unwrap();
-
-                // if nodemodrm == "true" {} If we are gonna use args
-                let javascript: String =
-                    res1.iter().nth(0).unwrap().as_path().display().to_string() + "/node_modules";
-                fs::remove_dir_all(javascript).unwrap();
-
-                if latest_commit > 15 {
-                    // valuedir.push(dir_names.to_path_buf());
-                    let origin = PathBuf::from(res1.iter().nth(0).unwrap());
-                    let dest = PathBuf::from(&files);
-                    let thread_count = 8;
-
-                    let mut archiver = Archiver::new();
-                    archiver.push(origin);
-                    archiver.set_destination(dest);
-                    archiver.set_thread_count(thread_count);
-
-                    match archiver.archive() {
-                        Ok(_) => (println!("Built!")),
-                        Err(e) => println!("Cannot archive the directory! {}", e),
-                    }
-                    fs::remove_dir_all(var).unwrap();
-                }
-                // println!("{:?} {:?}", res1.iter().nth(0).unwrap(), min(modif));
-            }
+            Zipper::zipper::zipper(res1, modif, &files, var);
         }
         println! {"\n"}
     }
