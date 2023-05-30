@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 use clap::Parser;
-=======
-use clap::{arg, command, Parser};
-extern crate diesel;
->>>>>>> 8033b4b03b9cba47a3fb942b966ad93a950efc7b
 use std::fs::{self, metadata, File};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
