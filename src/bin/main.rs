@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use clap::Parser;
 use std::fs::{self, metadata, File};
 use std::io::{BufRead, BufReader};
@@ -8,9 +6,45 @@ use std::{env, io, thread};
 mod DirectScan;
 mod Zipper;
 
+use diesel::prelude::*;
+use judson::{establish_connection, models::*};
+
+#[derive(Parser)]
+#[command(author, version)]
+struct Args {
+    // Add absolute path
+    #[arg(short, long)]
+    add: Option<String>,
+
+    // View paths and ID
+    #[arg(short, long)]
+    view: Option<String>,
+
+    // Select zipping type
+    #[arg(short, long)]
+    format: Option<String>,
+
+    // Target particular absolute path by the ID given to it, {obtain it from view}
+    #[arg(short, long)]
+    id: Option<String>,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    // let nodemodrm = &args[1]; If we are gonna use args
+    use judson::schema::jud::dsl::*;
+
+    let args = Args::parse();
+    println!("Hello {}", args.add.unwrap());
+
+    let connection = &mut establish_connection();
+
+    let results = jud
+        .filter(id.is_not_null())
+        .limit(5)
+        .select(Jud::as_select())
+        .load(connection)
+        .expect("Error loading posts");
+    println!("hi there diesel here");
+    println!("Displaying {:?} posts", results);
 
     let mut filesdir: Vec<String> = Vec::new();
     let reader = BufReader::new(File::open("files.txt").expect("Cannot open file.txt"));
@@ -51,6 +85,6 @@ fn main() {
 
             Zipper::zipper::zipper(res1, modif, &files, var);
         }
-        println! {"\n"}
+        println! {"\n hello"}
     }
 }

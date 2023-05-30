@@ -1,0 +1,5 @@
+CREATE TABLE jud (
+    id INT NOT NULL PRIMARY KEY,
+    abspath VARCHAR(100) NOT NULL,
+    zip VARCHAR(100) NOT NULL
+)
