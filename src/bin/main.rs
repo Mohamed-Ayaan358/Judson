@@ -7,10 +7,6 @@ use std::{env, io, thread};
 mod DirectScan;
 mod Zipper;
 
-use self::diesel::prelude::*;
-use judson::establish_connection;
-use judson::models::*;
-
 #[derive(Parser)]
 #[command(author, version)]
 struct Args {
@@ -32,16 +28,6 @@ struct Args {
 }
 
 fn main() {
-    use judson::schema::jud::dsl::*;
-
-    let connection = establish_connection();
-
-    let results = jud
-        .limit(5)
-        .load::<Jud>(&connection)
-        .expect("Error loading posts");
-    println!("Found {} plants in my garden", results.len());
-
     let args = Args::parse();
     println!("Hello {}", args.add.unwrap());
 
