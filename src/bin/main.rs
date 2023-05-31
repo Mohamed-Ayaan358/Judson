@@ -1,4 +1,5 @@
 use clap::Parser;
+use diesel::sql_types::Bool;
 use std::fs::{self, metadata, File};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
@@ -11,14 +12,15 @@ use judson::{establish_connection, models::*};
 
 #[derive(Parser)]
 #[command(author, version)]
+#[derive(Debug)]
 struct Args {
     // Add absolute path
-    #[arg(short, long)]
-    add: Option<String>,
+    #[arg(short, long, value_delimiter = ',', use_value_delimiter = true)]
+    add: Option<Vec<String>>,
 
     // View paths and ID
     #[arg(short, long)]
-    view: Option<String>,
+    view: Option<bool>,
 
     // Select zipping type
     #[arg(short, long)]
@@ -33,18 +35,43 @@ fn main() {
     use judson::schema::jud::dsl::*;
 
     let args = Args::parse();
-    println!("Hello {}", args.add.unwrap());
+    // println!("{:?}", args);
+    let mut addval = match args.add {
+        Some(_) => args.add,
+        None => None,
+    };
+    let mut viewval = match args.view {
+        Some(_) => args.view,
+        None => None,
+    };
+    let mut idval = match args.id {
+        Some(_) => args.id,
+        None => None,
+    };
+    let mut formatval = match args.format {
+        Some(_) => args.format,
+        None => None,
+    };
 
     let connection = &mut establish_connection();
 
-    let results = jud
-        .filter(id.is_not_null())
-        .limit(5)
-        .select(Jud::as_select())
-        .load(connection)
-        .expect("Error loading posts");
-    println!("hi there diesel here");
-    println!("Displaying {:?} posts", results);
+    match viewval {
+        Some(_) => {
+            let results = jud
+                .filter(id.is_not_null())
+                .limit(5)
+                .select(Jud::as_select())
+                .load(connection)
+                .expect("Error loading posts");
+
+            for var in results {
+                println!("{:?}", var);
+            }
+        }
+
+        None => println!("An error has occured"),
+    }
+    // println!("{:?} {:?} {:?}", addval, viewval, formatval);
 
     let mut filesdir: Vec<String> = Vec::new();
     let reader = BufReader::new(File::open("files.txt").expect("Cannot open file.txt"));
@@ -52,6 +79,7 @@ fn main() {
     for line in reader.lines() {
         filesdir.push(line.unwrap());
     }
+    println! {"\n "}
     println!("{:?}", filesdir);
     for files in filesdir {
         let res = match DirectScan::directscan::folders(Path::new(&files)) {
@@ -85,6 +113,6 @@ fn main() {
 
             // Zipper::zipper::zipper(res1, modif, &files, var);
         }
-        println! {"\n hello"}
+        println! {"\n "}
     }
 }
