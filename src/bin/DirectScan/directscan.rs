@@ -23,7 +23,6 @@ pub fn list_files(
     modifying: &mut Vec<u64>,
 ) -> Result<(Vec<PathBuf>, Vec<u64>), io::Error> {
     let mut value: Vec<PathBuf> = Vec::new();
-    // let mut modifying: Vec<u64> = Vec::new();
     if metadata(&path)?.is_dir() {
         let paths = fs::read_dir(&path)?;
         // print!("{}", &path.display());

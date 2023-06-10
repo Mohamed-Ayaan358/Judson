@@ -2,10 +2,11 @@
 
 diesel::table! {
     jud (id) {
-        id -> Integer,
+        #[max_length = 100]
+        id -> Varchar,
         #[max_length = 100]
         abspath -> Varchar,
         #[max_length = 100]
-        zip -> Varchar,
+        zipmethod -> Varchar,
     }
 }

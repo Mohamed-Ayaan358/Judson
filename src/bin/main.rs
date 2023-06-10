@@ -1,5 +1,7 @@
 use clap::Parser;
 use diesel::sql_types::Bool;
+use judson::schema::jud;
+use std::collections::HashMap;
 use std::fs::{self, metadata, File};
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
@@ -40,7 +42,7 @@ fn main() {
         Some(_) => args.add,
         None => None,
     };
-    let mut viewval = match args.view {
+    let viewval = match args.view {
         Some(_) => args.view,
         None => None,
     };
@@ -54,6 +56,38 @@ fn main() {
     };
 
     let connection = &mut establish_connection();
+    // let mut filesdir: Vec<String> = Vec::new();
+    let mut filesdirs: HashMap<String, String> = HashMap::new();
+
+    match addval {
+        Some(_) => {
+            let id_value = &addval.clone().unwrap()[0];
+            let abspath_value = &addval.clone().unwrap()[1];
+            let zipmethod_value = &addval.clone().unwrap()[2];
+
+            let new_record = Jud {
+                id: id_value.to_string(),
+                abspath: abspath_value.to_string(),
+                zipmethod: zipmethod_value.to_string(),
+            };
+
+            let inserted_rows = diesel::insert_into(jud)
+                .values(&new_record)
+                .execute(connection);
+
+            let results = jud
+                .filter(id.is_not_null())
+                .limit(5)
+                .select(Jud::as_select())
+                .load(connection)
+                .expect("Error loading posts");
+
+            for var in results {
+                filesdirs.insert(var.abspath, var.zipmethod);
+            }
+        }
+        None => println!(""),
+    }
 
     match viewval {
         Some(_) => {
@@ -65,31 +99,29 @@ fn main() {
                 .expect("Error loading posts");
 
             for var in results {
-                println!("{:?}", var);
+                // println!("{:?}", var);
+                filesdirs.insert(var.abspath, var.zipmethod);
             }
+            // println!("{:?}", filesdirs)
         }
 
-        None => println!("An error has occured"),
+        None => println!("No values present"),
     }
-    // println!("{:?} {:?} {:?}", addval, viewval, formatval);
 
-    let mut filesdir: Vec<String> = Vec::new();
-    let reader = BufReader::new(File::open("files.txt").expect("Cannot open file.txt"));
+    // let reader = BufReader::new(File::open("files.txt").expect("Cannot open file.txt"));
+    // for line in reader.lines() {
+    //     filesdir.push(line.unwrap());
+    // }
+    // println!("\n{:?}", filesdir);
 
-    for line in reader.lines() {
-        filesdir.push(line.unwrap());
-    }
-    println! {"\n "}
-    println!("{:?}", filesdir);
-    for files in filesdir {
-        let res = match DirectScan::directscan::folders(Path::new(&files)) {
+    for (path, method) in filesdirs {
+        let res = match DirectScan::directscan::folders(Path::new(&path)) {
             Ok(vecout) => vecout,
             Err(e) => {
                 panic!("{}", e);
             }
         };
-        let mut valuedir: Vec<PathBuf> = Vec::new();
-
+        println!("{:?}", path);
         let mut value: Vec<u64> = Vec::new();
         for var in res {
             let mut metadata = metadata(var.clone()).expect("Failed to get metadata");
@@ -112,6 +144,7 @@ fn main() {
                 };
 
             // Zipper::zipper::zipper(res1, modif, &files, var);
+            // DONT REMOVE IT
         }
         println! {"\n "}
     }
